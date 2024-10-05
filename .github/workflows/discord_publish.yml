@@ -27,4 +27,6 @@ jobs:
           run: uv sync --all-extras --dev
   
         - name: Run fetch_arxiv_papers.py
+          env:
+            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           run: uv run fetch_arxiv_papers.py
