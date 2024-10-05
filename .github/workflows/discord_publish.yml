@@ -10,23 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: チェックアウトリポジトリ
-        uses: actions/checkout@v4.2.0
-
-      - name: Pythonをセットアップ
-        uses: actions/setup-python@v5.2.0
-        with:
-          python-version: '3.x'
-      - uses: actions/cache@v3
-        with:
-            path: ~/.cache/uv
-            key: ${{ runner.os }}-uv-${{ hashFiles('**/requirements.txt') }}
-            restore-keys: |
-                 ${{ runner.os }}-uv-
-      - run: pip install uv && uv sync
-
-      - name: スクリプトを実行
-        env:
-            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-            uv run fetch_arxiv_papers.py
+        - uses: actions/checkout@v4
+  
+        - name: Install uv
+          uses: astral-sh/setup-uv@v3
+          with:
+            enable-cache: true
+  
+        - name: Set up Python
+          run: uv python installs
+  
+        - name: Install the project
+          run: uv sync --all-extras --dev
+  
+        - name: Run fetch_arxiv_papers.py
+          run: uv run fetch_arxiv_papers.py
