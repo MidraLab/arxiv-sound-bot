@@ -3,6 +3,7 @@ import feedparser
 from datetime import datetime, timedelta
 import requests  # Discordへの送信に使用
 import os
+import time
 
 # DiscordのWebhook URLを環境変数から取得
 WEBHOOK_URL = os.environ.get('DISCORD_WEBHOOK_URL')
@@ -15,7 +16,7 @@ if not WEBHOOK_URL:
 now = datetime.utcnow()
 
 # 3時間前のUTC時刻を取得
-time_threshold = now - timedelta(hours=3)
+time_threshold = now - timedelta(hours=5)
 
 # 検索クエリを定義
 # Computer Scienceのカテゴリを指定
@@ -66,7 +67,6 @@ for entry in feed.entries:
         # 論文情報をフォーマット
         message_content = f"""**タイトル:** {title}
 **Summary:** {summary}
-**論文のID:** {paper_id}
 **PDFのURL:** {pdf_url}
 **カテゴリー:** {categories}"""
 
@@ -76,13 +76,14 @@ for entry in feed.entries:
         }
 
         # DiscordのWebhookにPOSTリクエストを送信
-        response = requests.post(WEBHOOK_URL, data=payload)
+        response = requests.post(DISCORD_WEBHOOK_URL, data=payload)
 
         if response.status_code != 204:
             print(f'Failed to send message for paper ID {paper_id}. Status code: {response.status_code}')
         else:
             print(f'Sent paper ID {paper_id} to Discord.')
             paper_count += 1
+        time.sleep(3)  # 連続して送信しないように3秒待機
 
 # 処理が完了したことを表示
 print(f'Total {paper_count} papers sent to Discord.')
