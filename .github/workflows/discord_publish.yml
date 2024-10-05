@@ -23,7 +23,7 @@ jobs:
             key: ${{ runner.os }}-uv-${{ hashFiles('**/requirements.txt') }}
             restore-keys: |
                  ${{ runner.os }}-uv-
-      - run: pip install uv && uv pip install --system -r requirements.txt
+      - run: pip install uv && uv sy
 
       - name: スクリプトを実行
         run: |
