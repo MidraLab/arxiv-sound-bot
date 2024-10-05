@@ -1,0 +1,30 @@
+name: Fetch arXiv Papers
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'  # 3時間ごとに実行
+  workflow_dispatch:       # 手動実行も可能にする
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: チェックアウトリポジトリ
+        uses: actions/checkout@v4.2.0
+
+      - name: Pythonをセットアップ
+        uses: actions/setup-python@v5.2.0
+        with:
+          python-version: '3.x'
+      - uses: actions/cache@v3
+        with:
+            path: ~/.cache/uv
+            key: ${{ runner.os }}-uv-${{ hashFiles('**/requirements.txt') }}
+            restore-keys: |
+                 ${{ runner.os }}-uv-
+      - run: pip install uv && uv pip install --system -r requirements.txt
+
+      - name: スクリプトを実行
+        run: |
+          python fetch_arxiv_papers.py
