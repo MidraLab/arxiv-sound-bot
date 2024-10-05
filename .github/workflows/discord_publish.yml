@@ -23,8 +23,10 @@ jobs:
             key: ${{ runner.os }}-uv-${{ hashFiles('**/requirements.txt') }}
             restore-keys: |
                  ${{ runner.os }}-uv-
-      - run: pip install uv && uv sy
+      - run: pip install uv && uv sync
 
       - name: スクリプトを実行
+        env:
+            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          python fetch_arxiv_papers.py
+            uv run fetch_arxiv_papers.py
