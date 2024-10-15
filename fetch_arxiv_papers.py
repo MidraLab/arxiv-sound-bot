@@ -88,7 +88,7 @@ for entry in feed.entries:
         print(message_content)
 
         # DiscordのWebhookにPOSTリクエストを送信
-        response = requests.post(DISCORD_WEBHOOK_URL, data=payload)
+        response = requests.post(WEBHOOK_URL, data=payload)
 
         if response.status_code != 204:
             print(f'Failed to send message for paper ID {paper_id}. Status code: {response.status_code}')
@@ -102,7 +102,7 @@ payload = {
     'content': f'New papers notification completed. {paper_count} papers sent to Discord.'
 }
 
-response = requests.post(DISCORD_WEBHOOK_URL, data=payload)
+response = requests.post(WEBHOOK_URL, data=payload)
 
 if response.status_code != 204:
     print(f'Failed to send completion message. Status code: {response.status_code}')
