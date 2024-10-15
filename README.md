@@ -8,5 +8,5 @@ uv sync
 
 ## run
 ```bash
-uv run main.py
+uv run source/fetch_arxiv_papers.py
 ```
