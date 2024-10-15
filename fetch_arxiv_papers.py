@@ -53,18 +53,6 @@ def parse_date(date_str):
 # Discordに送信した論文の数をカウント
 paper_count = 0
 
-# フィードにエントリーが含まれていない場合
-if 'entries' not in feed:
-    # Discordに送信するペイロードを作成
-    payload = {
-        'content': "No entries found."
-    }
-
-    # DiscordのWebhookにPOSTリクエストを送信
-    response = requests.post(DISCORD_WEBHOOK_URL, data=payload)
-    print('No entries found.')
-    exit(0)
-
 # 各論文について、3時間以内に公開されたものをフィルタリングして情報を表示
 for entry in feed.entries:
     # 'published' フィールドの日付を解析
@@ -73,8 +61,6 @@ for entry in feed.entries:
 
     if not published:
         continue
-    
-    print(published)
     
     # 'published' がtime_thresholdよりも新しい場合のみ処理を続行
     if published >= time_threshold:
@@ -111,5 +97,15 @@ for entry in feed.entries:
             paper_count += 1
         time.sleep(5)  # 連続して送信しないように3秒待機
 
-# 処理が完了したことを表示
+# この時間の通知が完了したことを通知
+payload = {
+    'content': f'New papers notification completed. {paper_count} papers sent to Discord.'
+}
+
+response = requests.post(DISCORD_WEBHOOK_URL, data=payload)
+
+if response.status_code != 204:
+    print(f'Failed to send completion message. Status code: {response.status_code}')
+else:
+    print('Sent completion message to Discord.')
 print(f'Total {paper_count} papers sent to Discord.')
