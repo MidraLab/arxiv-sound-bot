@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import requests  # Discordへの送信に使用
 import os
 import time
+from gemini_util import GeminiUtil
 
 # リクエストの再試行回数と待機時間を設定
 MAX_RETRIES = 3
@@ -99,6 +100,7 @@ for entry in feed.entries:
         # 論文情報をフォーマット
         message_content = f"""**タイトル:** {title}
 **Summary:** {summary}
+**Summary(日本語):** {GeminiUtil().translate(summary)}
 **PDFのURL:** {pdf_url}
 **カテゴリー:** {categories}"""
 
