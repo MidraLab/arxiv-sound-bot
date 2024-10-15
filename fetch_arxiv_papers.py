@@ -5,6 +5,28 @@ import requests  # Discordへの送信に使用
 import os
 import time
 
+# リクエストの再試行回数と待機時間を設定
+MAX_RETRIES = 3
+RETRY_WAIT_TIME = 5  # 秒
+
+# フィードを取得する関数を定義
+def fetch_feed(url, retries=MAX_RETRIES):
+    for attempt in range(retries):
+        try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            }
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()  # HTTPエラーが発生した場合に例外を発生させる
+            return feedparser.parse(response.content)
+        except (requests.exceptions.RequestException, ConnectionResetError) as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            if attempt < retries - 1:
+                time.sleep(RETRY_WAIT_TIME)
+            else:
+                print("Failed to fetch feed after multiple attempts.")
+                raise  # 最終試行でも失敗した場合は例外を再発生させる
+
 # DiscordのWebhook URLを環境変数から取得
 WEBHOOK_URL = os.environ.get('DISCORD_WEBHOOK_URL')
 
@@ -15,7 +37,7 @@ if not WEBHOOK_URL:
 # 現在のUTC時刻を取得
 now = datetime.utcnow()
 
-# 3時間前のUTC時刻を取得
+# 5時間前のUTC時刻を取得
 time_threshold = now - timedelta(hours=5)
 
 # 検索クエリを定義
@@ -40,8 +62,8 @@ query_string = urllib.parse.urlencode(params, safe=':')
 # 完全なAPIリクエストURLを構築
 url = base_url + query_string
 
-# フィードをパース
-feed = feedparser.parse(url)
+# フィードを取得
+feed = fetch_feed(url)
 
 def parse_date(date_str):
     try:
@@ -53,7 +75,7 @@ def parse_date(date_str):
 # Discordに送信した論文の数をカウント
 paper_count = 0
 
-# 各論文について、3時間以内に公開されたものをフィルタリングして情報を表示
+# 各論文について、5時間以内に公開されたものをフィルタリングして情報を表示
 for entry in feed.entries:
     # 'published' フィールドの日付を解析
     published_str = entry.published
@@ -95,7 +117,7 @@ for entry in feed.entries:
         else:
             print(f'Sent paper ID {paper_id} to Discord.')
             paper_count += 1
-        time.sleep(5)  # 連続して送信しないように3秒待機
+        time.sleep(5)  # 連続して送信しないように5秒待機
 
 # この時間の通知が完了したことを通知
 payload = {
