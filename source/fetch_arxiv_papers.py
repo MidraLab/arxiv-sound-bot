@@ -4,11 +4,12 @@ from datetime import datetime, timedelta
 import requests  # Discordへの送信に使用
 import os
 import time
-from gemini_util import GeminiUtil
+from discord_util import DiscordUtil as DiscordUtilClass
 
 # リクエストの再試行回数と待機時間を設定
 MAX_RETRIES = 3
 RETRY_WAIT_TIME = 5  # 秒
+discord_util = DiscordUtilClass()  # インスタンス生成
 
 # フィードを取得する関数を定義
 def fetch_feed(url, retries=MAX_RETRIES):
@@ -28,108 +29,66 @@ def fetch_feed(url, retries=MAX_RETRIES):
                 print("Failed to fetch feed after multiple attempts.")
                 raise  # 最終試行でも失敗した場合は例外を再発生させる
 
-# DiscordのWebhook URLを環境変数から取得
-WEBHOOK_URL = os.environ.get('DISCORD_WEBHOOK_URL')
+def run():
+    # 現在のUTC時刻を取得
+    now = datetime.utcnow()
 
-if not WEBHOOK_URL:
-    print('Error: DISCORD_WEBHOOK_URL is not set.')
-    exit(1)
+    # 5時間前のUTC時刻を取得
+    time_threshold = now - timedelta(hours=25)
 
-# 現在のUTC時刻を取得
-now = datetime.utcnow()
+    # 検索クエリを定義
+    # Computer Scienceのカテゴリを指定
+    query = 'cat:cs.SD'
 
-# 5時間前のUTC時刻を取得
-time_threshold = now - timedelta(hours=5)
+    # ベースとなるAPIのURL
+    base_url = 'http://export.arxiv.org/api/query?'
 
-# 検索クエリを定義
-# Computer Scienceのカテゴリを指定
-query = 'cat:cs.SD'
+    # APIパラメータの設定
+    params = {
+        'search_query': query,
+        'start': 0,                   # 取得開始位置
+        'max_results': 100,           # 取得する結果の最大数（必要に応じて増やしてください）
+        'sortBy': 'submittedDate',    # 提出日の新しい順にソート
+        'sortOrder': 'descending',
+    }
 
-# ベースとなるAPIのURL
-base_url = 'http://export.arxiv.org/api/query?'
+    # パラメータをURLエンコードしてクエリ文字列を作成
+    query_string = urllib.parse.urlencode(params, safe=':')
 
-# APIパラメータの設定
-params = {
-    'search_query': query,
-    'start': 0,                   # 取得開始位置
-    'max_results': 100,           # 取得する結果の最大数（必要に応じて増やしてください）
-    'sortBy': 'submittedDate',    # 提出日の新しい順にソート
-    'sortOrder': 'descending',
-}
+    # 完全なAPIリクエストURLを構築
+    url = base_url + query_string
 
-# パラメータをURLエンコードしてクエリ文字列を作成
-query_string = urllib.parse.urlencode(params, safe=':')
+    # フィードを取得
+    feed = fetch_feed(url)
 
-# 完全なAPIリクエストURLを構築
-url = base_url + query_string
+    def parse_date(date_str):
+        try:
+            return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+        except ValueError as e:
+            print(f"Error parsing date: {e}")
+            return None
 
-# フィードを取得
-feed = fetch_feed(url)
+    # Discordに送信した論文の数をカウント
+    paper_count = 0
 
-def parse_date(date_str):
-    try:
-        return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
-    except ValueError as e:
-        print(f"Error parsing date: {e}")
-        return None
+    # 各論文について、5時間以内に公開されたものをフィルタリングして情報を表示
+    for entry in feed.entries:
+        # 'published' フィールドの日付を解析
+        published_str = entry.published
+        published = parse_date(published_str)
 
-# Discordに送信した論文の数をカウント
-paper_count = 0
-
-# 各論文について、5時間以内に公開されたものをフィルタリングして情報を表示
-for entry in feed.entries:
-    # 'published' フィールドの日付を解析
-    published_str = entry.published
-    published = parse_date(published_str)
-
-    if not published:
-        continue
-    
-    # 'published' がtime_thresholdよりも新しい場合のみ処理を続行
-    if published >= time_threshold:
-        title = entry.title
-        summary = entry.summary.replace('\n', ' ')  # 改行を削除して整形
-        paper_id = entry.id.split('/abs/')[-1]
-        pdf_url = ''
-        for link in entry.links:
-            if 'title' in link and link.title == 'pdf':
-                pdf_url = link.href
-                break
-        categories = ', '.join(tag['term'] for tag in entry.tags)
+        if not published:
+            continue
         
-        # 論文情報をフォーマット
-        message_content = f"""**タイトル:** {title}
-**Summary:** {summary}
-**Summary(日本語):** {GeminiUtil().translate(summary)}
-**PDFのURL:** {pdf_url}
-**カテゴリー:** {categories}"""
-
-        # Discordに送信するペイロードを作成
-        payload = {
-            'content': message_content
-        }
-        
-        print(message_content)
-
-        # DiscordのWebhookにPOSTリクエストを送信
-        response = requests.post(WEBHOOK_URL, data=payload)
-
-        if response.status_code != 204:
-            print(f'Failed to send message for paper ID {paper_id}. Status code: {response.status_code}')
-        else:
-            print(f'Sent paper ID {paper_id} to Discord.')
+        # 'published' がtime_thresholdよりも新しい場合のみ処理を続行
+        if published >= time_threshold:
+            discord_util.send_message(entry)
             paper_count += 1
-        time.sleep(5)  # 連続して送信しないように5秒待機
+            
+            time.sleep(5)  # 連続して送信しないように5秒待機
 
-# この時間の通知が完了したことを通知
-payload = {
-    'content': f'New papers notification completed. {paper_count} papers sent to Discord.'
-}
+    # Discordに完了したことを通知
+    discord_util.send_completion_message(paper_count)
 
-response = requests.post(WEBHOOK_URL, data=payload)
-
-if response.status_code != 204:
-    print(f'Failed to send completion message. Status code: {response.status_code}')
-else:
-    print('Sent completion message to Discord.')
-print(f'Total {paper_count} papers sent to Discord.')
+if __name__ == '__main__':
+    run()
