@@ -34,7 +34,7 @@ def run():
     now = datetime.utcnow()
 
     # 5時間前のUTC時刻を取得
-    time_threshold = now - timedelta(hours=25)
+    time_threshold = now - timedelta(hours=5)
 
     # 検索クエリを定義
     # Computer Scienceのカテゴリを指定
