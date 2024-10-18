@@ -1,96 +1,74 @@
-import urllib.parse
-from datetime import datetime
-import requests  
-import time
+from dotenv import load_dotenv
 import os
-import json
-from discord_util import DiscordUtil
-from arxiv import fetch_feed
+import requests
+from gemini_util import GeminiUtil as GeminiUtilClass
 
-discord_util = DiscordUtil()  
-JSON_FILE_DIR = "opt"
-JSON_FILE_PATH = os.path.join(JSON_FILE_DIR, "contents_info.json")
-
-def save_latest_id(latest_id):
-    """最新のIDを保存する"""
-    if not os.path.exists(JSON_FILE_DIR):
-        os.makedirs(JSON_FILE_DIR)
-    with open(JSON_FILE_PATH, 'w') as f:
-        json.dump({"latest_id": latest_id}, f)
-
-def load_latest_id():
-    """最新のIDを読み込む"""
-    if os.path.exists(JSON_FILE_PATH):
-        with open(JSON_FILE_PATH, 'r') as f:
-            data = json.load(f)
-            return data.get("latest_id", None)
-    # ファイルが存在しない場合は空のファイルを作成する
-    else:
-        if not os.path.exists(JSON_FILE_DIR):
-            os.makedirs(JSON_FILE_DIR)
-        with open(JSON_FILE_PATH, 'w') as f:
-            json.dump({"latest_id": ""}, f)
-    return None
-
-def parse_date(date_str):
-    """日付を解析する"""
-    try:
-        return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
-    except ValueError as e:
-        print(f"Error parsing date: {e}")
-        return None
-
-def run():
-    # 検索クエリを定義
-    query = 'cat:cs.SD'
-
-    # ベースとなるAPIのURL
-    base_url = 'http://export.arxiv.org/api/query?'
-
-    # APIパラメータの設定
-    params = {
-        'search_query': query,
-        'start': 0,                   
-        'max_results': 10,           
-        'sortBy': 'submittedDate',    
-        'sortOrder': 'descending',
-    }
-
-    # パラメータをURLエンコードしてクエリ文字列を作成
-    query_string = urllib.parse.urlencode(params, safe=':')
-
-    # 完全なAPIリクエストURLを構築
-    url = base_url + query_string
-
-    # フィードを取得
-    feed = fetch_feed(url)
-
-    # 最新のIDを読み込む
-    latest_id = load_latest_id()
-
-    # Discordに送信した論文の数をカウント
-    paper_count = 0
-
-    # 各論文について、最新のIDと比較して新しいものを処理する
-    for entry in feed.entries:
-        current_id = entry.id.split('/')[-1]
+class DiscordUtil:
+    def __init__(self):
+        """discord utilの初期化
+        """
+        load_dotenv()
+        self.discord_web_hook = os.environ.get('DISCORD_WEBHOOK_URL')
+        self.gemini_util = GeminiUtilClass()  # インスタンス生成
         
-        # 最新のIDが存在しないか、現在のIDが最新のIDよりも新しい場合に処理を続行
-        if latest_id is not None and current_id == latest_id:
-            print("最新のコンテンツまで到達しました。")
-            break
+    def send_message(self, entry) -> None:
+        """
+        Send message to discord webhook
+
+        Args:
+            entry (dict): the paper entry to send
+        """
         
-        discord_util.send_message(entry)
-        paper_count += 1
+        title = entry.title
+        summary = entry.summary.replace('\n', ' ')  # 改行を削除して整形
+        paper_id = entry.id.split('/abs/')[-1]
+        pdf_url = ''
+        for link in entry.links:
+            if 'title' in link and link.title == 'pdf':
+                pdf_url = link.href
+                break
+        categories = ', '.join(tag['term'] for tag in entry.tags)
+        
+        # 論文情報をフォーマット
+        message_content = (
+            "-----------------------------------\n"
+            f"**タイトル:** \n{title}\n\n"
+            f"**Summary (日本語):** \n{self.gemini_util.translate(summary)}\n"
+            f"**PDFのURL:** [Link]({pdf_url})\n"
+            f"**Published:** {entry.published}\n"
+            "-----------------------------------"
+        )
 
-        # 最初のエントリのIDを保存
-        if paper_count == 1:
-            save_latest_id(current_id)
+        # Discordに送信するペイロードを作成
+        payload = {
+            'content': message_content
+        }
+        
+        print(message_content)
 
-        time.sleep(5)  # 連続して送信しないように5秒待機
+        # DiscordのWebhookにPOSTリクエストを送信
+        # response = requests.post(self.discord_web_hook, data=payload)
+
+        # if response.status_code != 204:
+        #     print(f'Failed to send message for paper ID {paper_id}. Status code: {response.status_code}.message count: {len(message_content)}')
+        # else:
+        #     print(f'Sent paper ID {paper_id} to Discord.')
     
-    # Discordに完了したことを通知
-    discord_util.send_completion_message(paper_count)
+    def send_completion_message(self, paper_count) -> None:
+        """discord に情報を送信したことを通知するメッセージを送信
 
-if __name__ == '__main__':
-    run()
+        Args:
+            paper_count (_type_): _description_
+        """
+            # この時間の通知が完了したことを通知
+        payload = {
+            'content': f'New papers notification completed. {paper_count} papers sent to Discord.'
+        }
+
+        response = requests.post(self.discord_web_hook, data=payload)
+
+        if response.status_code != 204:
+            print(f'Failed to send completion message. Status code: {response.status_code}')
+        else:
+            print('Sent completion message to Discord.')
+        print(f'Total {paper_count} papers sent to Discord.')

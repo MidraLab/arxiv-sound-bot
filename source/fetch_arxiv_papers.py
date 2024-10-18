@@ -12,12 +12,14 @@ JSON_FILE_DIR = "opt"
 JSON_FILE_PATH = os.path.join(JSON_FILE_DIR, "contents_info.json")
 
 def save_latest_id(latest_id):
+    """最新のIDを保存する"""
     if not os.path.exists(JSON_FILE_DIR):
         os.makedirs(JSON_FILE_DIR)
     with open(JSON_FILE_PATH, 'w') as f:
         json.dump({"latest_id": latest_id}, f)
 
 def load_latest_id():
+    """最新のIDを読み込む"""
     if os.path.exists(JSON_FILE_PATH):
         with open(JSON_FILE_PATH, 'r') as f:
             data = json.load(f)
@@ -30,10 +32,15 @@ def load_latest_id():
             json.dump({"latest_id": ""}, f)
     return None
 
-def run():
-    # 現在のUTC時刻を取得
-    now = datetime.utcnow()
+def parse_date(date_str):
+    """日付を解析する"""
+    try:
+        return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+    except ValueError as e:
+        print(f"Error parsing date: {e}")
+        return None
 
+def run():
     # 検索クエリを定義
     query = 'cat:cs.SD'
 
@@ -44,7 +51,7 @@ def run():
     params = {
         'search_query': query,
         'start': 0,                   
-        'max_results': 10,           
+        'max_results': 100,           
         'sortBy': 'submittedDate',    
         'sortOrder': 'descending',
     }
@@ -67,17 +74,20 @@ def run():
     # 各論文について、最新のIDと比較して新しいものを処理する
     for entry in feed.entries:
         current_id = entry.id.split('/')[-1]
-
+        
         # 最新のIDが存在しないか、現在のIDが最新のIDよりも新しい場合に処理を続行
-        if latest_id is None or current_id > latest_id:
-            discord_util.send_message(entry)
-            paper_count += 1
+        if latest_id is not None and current_id == latest_id:
+            print("最新のコンテンツまで到達しました。")
+            break
+        
+        discord_util.send_message(entry)
+        paper_count += 1
 
-            # 最初のエントリのIDを保存
-            if paper_count == 1:
-                save_latest_id(current_id)
+        # 最初のエントリのIDを保存
+        if paper_count == 1:
+            save_latest_id(current_id)
 
-            time.sleep(5)  # 連続して送信しないように5秒待機
+        time.sleep(5)  # 連続して送信しないように5秒待機
     
     # Discordに完了したことを通知
     discord_util.send_completion_message(paper_count)
