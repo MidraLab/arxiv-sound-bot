@@ -51,7 +51,7 @@ def run():
     params = {
         'search_query': query,
         'start': 0,                   
-        'max_results': 100,           
+        'max_results': 10,           
         'sortBy': 'submittedDate',    
         'sortOrder': 'descending',
     }
