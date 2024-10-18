@@ -31,3 +31,15 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GENIMI_API_KEY: ${{ secrets.GENIMI_API_KEY }}
         run: uv run source/fetch_arxiv_papers.py
+      
+
+      - name: Commit And Push contents info file
+        run: |
+          git remote set-url origin https://github-actions:${GITHUB_TOKEN}@github.com/MidraLab/arxiv-sound-bot
+          git config --global user.name "MidraLab"
+          git config --global user.email "midralab@gmail.com" 
+          git add opt/contents_info.json
+          git commit -m "Update index file"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
