@@ -33,10 +33,8 @@ class DiscordUtil:
         message_content = (
             "-----------------------------------\n"
             f"**タイトル:** \n{title}\n\n"
-            f"**Summary:** \n{summary}\n\n"
             f"**Summary (日本語):** \n{self.gemini_util.translate(summary)}\n"
             f"**PDFのURL:** [Link]({pdf_url})\n"
-            f"**カテゴリー:** {categories}\n"
             f"**Published:** {entry.published}\n"
             "-----------------------------------"
         )
@@ -52,7 +50,7 @@ class DiscordUtil:
         response = requests.post(self.discord_web_hook, data=payload)
 
         if response.status_code != 204:
-            print(f'Failed to send message for paper ID {paper_id}. Status code: {response.status_code}')
+            print(f'Failed to send message for paper ID {paper_id}. Status code: {response.status_code}.message count: {len(message_content)}')
         else:
             print(f'Sent paper ID {paper_id} to Discord.')
     
