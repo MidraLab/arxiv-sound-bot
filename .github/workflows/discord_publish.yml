@@ -2,7 +2,7 @@ name: Fetch arXiv Papers
 
 on:
   schedule:
-    - cron: '0 */3 * * *'  # 3時間ごとに実行
+    - cron: '0 */12 * * *'  # 3時間ごとに実行
   workflow_dispatch:  # 手動実行も可能にする
   push:
     branches:
