@@ -47,12 +47,12 @@ class DiscordUtil:
         print(message_content)
 
         # DiscordのWebhookにPOSTリクエストを送信
-        # response = requests.post(self.discord_web_hook, data=payload)
+        response = requests.post(self.discord_web_hook, data=payload)
 
-        # if response.status_code != 204:
-        #     print(f'Failed to send message for paper ID {paper_id}. Status code: {response.status_code}.message count: {len(message_content)}')
-        # else:
-        #     print(f'Sent paper ID {paper_id} to Discord.')
+        if response.status_code != 204:
+            print(f'Failed to send message for paper ID {paper_id}. Status code: {response.status_code}.message count: {len(message_content)}')
+        else:
+            print(f'Sent paper ID {paper_id} to Discord.')
     
     def send_completion_message(self, paper_count) -> None:
         """discord に情報を送信したことを通知するメッセージを送信
