@@ -1,5 +1,5 @@
 import urllib.parse
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests  
 import time
 import os
@@ -34,7 +34,10 @@ def load_latest_entry():
 def parse_date(date_str):
     """日付を解析する"""
     try:
-        return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+        # UTCとしてパース（Zはゼロタイムゾーン = UTC）
+        dt = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+        # タイムゾーン情報を削除（naiveなdatetimeにする）
+        return dt.replace(tzinfo=None)
     except ValueError as e:
         print(f"Error parsing date: {e}")
         return None
@@ -70,11 +73,24 @@ def run():
 
     # Discordに送信した論文の数をカウント
     paper_count = 0
+    
+    # 3日前の日付を計算
+    three_days_ago = datetime.now() - timedelta(days=3)
 
     # 各論文について、最新のIDと比較して新しいものを処理する
     for entry in feed.entries:
         current_id = entry.id.split('/')[-1]
         current_date = entry.published
+        
+        # 公開日をdatetimeオブジェクトに変換
+        published_datetime = parse_date(current_date)
+        if published_datetime is None:
+            continue
+            
+        # 3日以上前の論文はスキップ
+        if published_datetime < three_days_ago:
+            print(f"3日以上前の論文のためスキップ: {current_date}")
+            break
 
         # 最新のIDが存在しないか、現在のIDが最新のIDよりも新しい場合に処理を続行
         if latest_id is not None and current_id == latest_id:
