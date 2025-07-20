@@ -43,8 +43,12 @@ def parse_date(date_str):
         return None
 
 def run():
-    # 検索クエリを定義
-    query = 'cat:cs.SD'
+    # 検索クエリを定義（音声合成・音声認識・感情分析に特化）
+    # eess.AS: Audio and Speech Processing (音声処理の主要カテゴリ)
+    # cs.SD: Sound (音響関連)
+    # cs.CL: Computation and Language (音声認識・合成で言語処理を含む場合)
+    # これらのカテゴリの論文を取得
+    query = 'cat:eess.AS OR cat:cs.SD OR (cat:cs.CL AND (abs:"speech" OR abs:"voice" OR abs:"audio"))'
 
     # ベースとなるAPIのURL
     base_url = 'http://export.arxiv.org/api/query?'
