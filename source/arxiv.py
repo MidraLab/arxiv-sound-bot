@@ -1,5 +1,6 @@
 import feedparser
 import requests
+import time
 
 MAX_RETRIES = 3
 RETRY_WAIT_TIME = 5  # 秒

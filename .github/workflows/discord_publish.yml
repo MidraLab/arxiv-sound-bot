@@ -29,7 +29,7 @@ jobs:
       - name: Run fetch_arxiv_papers.py
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          GENIMI_API_KEY: ${{ secrets.GENIMI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: uv run source/fetch_arxiv_papers.py
 
       # git statusを確認し、変更があればコミットとプッシュを行う

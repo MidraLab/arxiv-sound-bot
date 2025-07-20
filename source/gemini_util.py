@@ -5,7 +5,7 @@ import os
 class GeminiUtil:
     def __init__(self):
         load_dotenv()
-        self.api_key = WEBHOOK_URL = os.environ.get('GENIMI_API_KEY')
+        self.api_key = os.environ.get('GEMINI_API_KEY')
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel(
             model_name='gemini-1.5-flash',
