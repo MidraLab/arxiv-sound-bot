@@ -29,9 +29,9 @@ class DiscordUtil:
                 break
         categories = ', '.join(tag['term'] for tag in entry.tags)
         
-        # URLを生成
-        arxiv_url = f"https://arxiv.org/abs/{paper_id}"
-        alphaxiv_url = f"https://www.alphaxiv.org/abs/{paper_id}"
+        # URLを生成（<>で囲むとプレビューが無効になる）
+        arxiv_url = f"<https://arxiv.org/abs/{paper_id}>"
+        alphaxiv_url = f"<https://www.alphaxiv.org/abs/{paper_id}>"
         
         # 論文情報をフォーマット
         message_content = (
@@ -39,7 +39,7 @@ class DiscordUtil:
             f"📝 **要約（日本語）:**\n{self.gemini_util.translate(summary)}\n\n"
             f"🔗 **リンク:**\n"
             f"• [AlphaXivで読む]({alphaxiv_url}) - コメント・議論付き\n"
-            f"• [PDF]({pdf_url}) | [arXiv]({arxiv_url})\n\n"
+            f"• [PDF](<{pdf_url}>) | [arXiv]({arxiv_url})\n\n"
             f"🏷️ **カテゴリ:** {categories}\n"
             f"📅 **公開日:** {entry.published}"
         )
