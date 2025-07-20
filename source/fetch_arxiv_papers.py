@@ -74,8 +74,8 @@ def run():
     # Discordに送信した論文の数をカウント
     paper_count = 0
     
-    # 3日前の日付を計算
-    three_days_ago = datetime.now() - timedelta(days=3)
+    # 7日前の日付を計算（一時的に制限を緩和）
+    three_days_ago = datetime.now() - timedelta(days=7)
 
     # 各論文について、最新のIDと比較して新しいものを処理する
     for entry in feed.entries:
@@ -97,7 +97,11 @@ def run():
             print("最新のコンテンツまで到達しました。")
             break
         
-        discord_util.send_message(entry)
+        # 環境変数が設定されている場合のみDiscordに送信
+        if os.environ.get('DISCORD_WEBHOOK_URL') and os.environ.get('GEMINI_API_KEY'):
+            discord_util.send_message(entry)
+        else:
+            print(f"環境変数未設定のため、Discordへの送信をスキップ: {current_id}")
         paper_count += 1
 
         # 最初のエントリのデータを保存
@@ -109,8 +113,11 @@ def run():
 
         time.sleep(5)  # 連続して送信しないように5秒待機
     
-    # Discordに完了したことを通知
-    discord_util.send_completion_message(paper_count)
+    # Discordに完了したことを通知（環境変数が設定されている場合のみ）
+    if os.environ.get('DISCORD_WEBHOOK_URL') and os.environ.get('GEMINI_API_KEY'):
+        discord_util.send_completion_message(paper_count)
+    else:
+        print(f"処理完了: {paper_count}件の論文を処理しました。")
 
 if __name__ == '__main__':
     run()
