@@ -8,7 +8,7 @@ class GeminiUtil:
         self.api_key = os.environ.get('GEMINI_API_KEY')
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel(
-            model_name='gemini-1.5-flash',
+            model_name='gemini-2.0-flash',
             system_instruction="あなたは日本と英語の翻訳を行うAIです。渡した内容の文章を日本語に翻訳してください。"
         )
     

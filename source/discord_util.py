@@ -29,14 +29,19 @@ class DiscordUtil:
                 break
         categories = ', '.join(tag['term'] for tag in entry.tags)
         
+        # URLを生成
+        arxiv_url = f"https://arxiv.org/abs/{paper_id}"
+        alphaxiv_url = f"https://www.alphaxiv.org/abs/{paper_id}"
+        
         # 論文情報をフォーマット
         message_content = (
-            "-----------------------------------\n"
-            f"**タイトル:** \n{title}\n\n"
-            f"**Summary (日本語):** \n{self.gemini_util.translate(summary)}\n"
-            f"**PDFのURL:** [Link]({pdf_url})\n"
-            f"**Published:** {entry.published}\n"
-            "-----------------------------------"
+            f"📄 **{title}**\n\n"
+            f"📝 **要約（日本語）:**\n{self.gemini_util.translate(summary)}\n\n"
+            f"🔗 **リンク:**\n"
+            f"• [AlphaXivで読む]({alphaxiv_url}) - コメント・議論付き\n"
+            f"• [PDF]({pdf_url}) | [arXiv]({arxiv_url})\n\n"
+            f"🏷️ **カテゴリ:** {categories}\n"
+            f"📅 **公開日:** {entry.published}"
         )
 
         # Discordに送信するペイロードを作成
@@ -62,7 +67,7 @@ class DiscordUtil:
         """
             # この時間の通知が完了したことを通知
         payload = {
-            'content': f'New papers notification completed. {paper_count} papers sent to Discord.'
+            'content': f'✅ 新着論文の通知が完了しました\n📊 送信した論文数: {paper_count}件'
         }
 
         response = requests.post(self.discord_web_hook, data=payload)
