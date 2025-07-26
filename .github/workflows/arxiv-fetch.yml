@@ -1,0 +1,49 @@
+name: Fetch ArXiv Papers
+
+on:
+  schedule:
+    # 毎日 JST 9:00 (UTC 0:00) に実行
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  fetch-papers:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+        cache-dependency-glob: "uv.lock"
+    
+    - name: Set up Python
+      run: uv python install 3.10
+    
+    - name: Install dependencies
+      run: uv sync
+    
+    - name: Run ArXiv fetcher
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        DISCORD_WEBHOOK_SOUND: ${{ secrets.DISCORD_WEBHOOK_URL }}  # 既存のWebhookをサウンド用として使用
+        DISCORD_WEBHOOK_3D: ${{ secrets.DISCORD_WEBHOOK_3D }}
+        DISCORD_WEBHOOK_MOTION: ${{ secrets.DISCORD_WEBHOOK_MOTION }}
+      run: |
+        uv run python source/fetch_arxiv_papers.py
+    
+    - name: Commit updated state files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add opt/*.json || true
+        git diff --staged --quiet || git commit -m "Update latest paper IDs [skip ci]"
+    
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}

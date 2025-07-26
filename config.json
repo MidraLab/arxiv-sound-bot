@@ -1,0 +1,28 @@
+{
+  "categories": [
+    {
+      "name": "sound",
+      "webhook_env": "DISCORD_WEBHOOK_SOUND",
+      "query": "cat:eess.AS OR cat:cs.SD OR (cat:cs.CL AND (abs:\"speech\" OR abs:\"voice\" OR abs:\"audio\"))",
+      "json_file": "opt/sound_info.json",
+      "description": "音声合成・音声認識・感情分析"
+    },
+    {
+      "name": "3d_model",
+      "webhook_env": "DISCORD_WEBHOOK_3D",
+      "query": "(cat:cs.GR OR cat:cs.CV) AND (abs:\"3D\" AND (abs:\"generation\" OR abs:\"reconstruction\" OR abs:\"synthesis\" OR abs:\"neural radiance\" OR abs:\"gaussian splatting\" OR abs:\"mesh\" OR abs:\"point cloud\"))",
+      "json_file": "opt/3d_model_info.json",
+      "description": "3Dモデル生成・再構築"
+    },
+    {
+      "name": "motion",
+      "webhook_env": "DISCORD_WEBHOOK_MOTION",
+      "query": "(cat:cs.GR OR cat:cs.CV) AND (abs:\"motion\" AND (abs:\"synthesis\" OR abs:\"generation\" OR abs:\"animation\" OR abs:\"human motion\" OR abs:\"character animation\"))",
+      "json_file": "opt/motion_info.json",
+      "description": "モーション生成・アニメーション"
+    }
+  ],
+  "max_papers_per_category": 10,
+  "days_to_check": 7,
+  "wait_time_seconds": 5
+}

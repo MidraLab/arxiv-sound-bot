@@ -4,11 +4,14 @@ import requests
 from gemini_util import GeminiUtil as GeminiUtilClass
 
 class DiscordUtil:
-    def __init__(self):
+    def __init__(self, webhook_url=None):
         """discord utilの初期化
+        
+        Args:
+            webhook_url (str, optional): Discord webhook URL. If not provided, uses DISCORD_WEBHOOK_URL from env.
         """
         load_dotenv()
-        self.discord_web_hook = os.environ.get('DISCORD_WEBHOOK_URL')
+        self.discord_web_hook = webhook_url or os.environ.get('DISCORD_WEBHOOK_URL')
         self.gemini_util = GeminiUtilClass()  # インスタンス生成
         
     def send_message(self, entry) -> None:
@@ -18,6 +21,9 @@ class DiscordUtil:
         Args:
             entry (dict): the paper entry to send
         """
+        if not self.discord_web_hook:
+            print("Discord webhook URLが設定されていません。")
+            return
         
         title = entry.title
         summary = entry.summary.replace('\n', ' ')  # 改行を削除して整形
@@ -49,7 +55,7 @@ class DiscordUtil:
             'content': message_content
         }
         
-        print(message_content)
+        print(f"論文ID {paper_id} を処理中...")
 
         # DiscordのWebhookにPOSTリクエストを送信
         response = requests.post(self.discord_web_hook, data=payload)
@@ -59,15 +65,23 @@ class DiscordUtil:
         else:
             print(f'Sent paper ID {paper_id} to Discord.')
     
-    def send_completion_message(self, paper_count) -> None:
+    def send_completion_message(self, paper_count, category_name="") -> None:
         """discord に情報を送信したことを通知するメッセージを送信
 
         Args:
-            paper_count (_type_): _description_
+            paper_count (int): 送信した論文数
+            category_name (str, optional): カテゴリ名
         """
-            # この時間の通知が完了したことを通知
+        if not self.discord_web_hook:
+            print("Discord webhook URLが設定されていません。")
+            return
+            
+        # カテゴリ名を含めたメッセージ
+        category_text = f"（{category_name}）" if category_name else ""
+        
+        # この時間の通知が完了したことを通知
         payload = {
-            'content': f'✅ 新着論文の通知が完了しました\n📊 送信した論文数: {paper_count}件'
+            'content': f'✅ 新着論文{category_text}の通知が完了しました\n📊 送信した論文数: {paper_count}件'
         }
 
         response = requests.post(self.discord_web_hook, data=payload)
@@ -75,5 +89,5 @@ class DiscordUtil:
         if response.status_code != 204:
             print(f'Failed to send completion message. Status code: {response.status_code}')
         else:
-            print('Sent completion message to Discord.')
-        print(f'Total {paper_count} papers sent to Discord.')
+            print(f'Sent completion message to Discord.')
+        print(f'Total {paper_count} papers sent to Discord for {category_name}.')
