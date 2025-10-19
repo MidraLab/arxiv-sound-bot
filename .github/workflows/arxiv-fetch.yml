@@ -29,7 +29,7 @@ jobs:
     - name: Run ArXiv fetcher
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        DISCORD_WEBHOOK_SOUND: ${{ secrets.DISCORD_WEBHOOK_URL }}  # 既存のWebhookをサウンド用として使用
+        DISCORD_WEBHOOK_SOUND: ${{ secrets.DISCORD_WEBHOOK_SOUND }}
         DISCORD_WEBHOOK_3D: ${{ secrets.DISCORD_WEBHOOK_3D }}
         DISCORD_WEBHOOK_MOTION: ${{ secrets.DISCORD_WEBHOOK_MOTION }}
       run: |
