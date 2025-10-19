@@ -4,7 +4,7 @@ This bot monitors ArXiv for new papers in audio and speech processing categories
 
 ## Prerequisites
 
-- Python 3.10 or higher
+- Python 3.12 or higher
 - [uv](https://github.com/astral-sh/uv) package manager
 - Discord webhook URL
 - Google Gemini API key
