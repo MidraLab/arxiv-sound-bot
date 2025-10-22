@@ -28,8 +28,11 @@ cp .env.example .env
 ```
 
 Edit the `.env` file and add your credentials:
-- `DISCORD_WEBHOOK_URL`: Your Discord webhook URL
-- `GEMINI_API_KEY`: Your Google Gemini API key
+- `GEMINI_API_KEY`: Your Google Gemini API key (required)
+- `DISCORD_WEBHOOK_SOUND`: Discord webhook URL for sound processing papers
+- `DISCORD_WEBHOOK_3D`: Discord webhook URL for 3D model papers (optional)
+- `DISCORD_WEBHOOK_MOTION`: Discord webhook URL for motion generation papers (optional)
+- `DISCORD_WEBHOOK_MOVIE`: Discord webhook URL for video generation papers (optional)
 
 ### 4. Test the setup
 ```bash
@@ -38,12 +41,13 @@ uv run python source/fetch_arxiv_papers.py
 
 ## What the bot does
 
-1. **Searches ArXiv** for papers in these categories:
-   - `eess.AS`: Audio and Speech Processing
-   - `cs.SD`: Sound
-   - `cs.CL`: Computation and Language (filtered for speech/voice/audio)
+1. **Monitors multiple categories**:
+   - Sound processing (audio synthesis, recognition, emotion analysis)
+   - 3D model generation (NeRF, Gaussian Splatting, etc.)
+   - Motion generation (animation, human motion)
+   - Video generation (text-to-video, video synthesis)
 
-2. **Filters papers** by date (only processes papers from the last 7 days)
+2. **Filters papers** by date (only processes papers from the last 7 days by default)
 
 3. **Translates abstracts** to Japanese using Google Gemini
 
@@ -53,7 +57,7 @@ uv run python source/fetch_arxiv_papers.py
    - Links to AlphaXiv, PDF, and ArXiv
    - Categories and publication date
 
-5. **Tracks processed papers** to avoid duplicates using `opt/contents_info.json`
+5. **Tracks processed papers** to avoid duplicates using category-specific JSON files in `opt/` directory
 
 ## Running the bot
 

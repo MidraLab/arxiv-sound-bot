@@ -6,15 +6,16 @@
 
 GitHubリポジトリの Settings > Secrets and variables > Actions から以下のシークレットを設定してください：
 
-### 既に設定済みのシークレット
-- **GEMINI_API_KEY** ✅ - 設定済み（必須）
-- **DISCORD_WEBHOOK_URL** ✅ - 設定済み（サウンド論文用として使用）
+### 必須のシークレット
+- **GEMINI_API_KEY** - Google Gemini APIキー（必須）
+- **DISCORD_WEBHOOK_SOUND** - 音声処理論文用のDiscord Webhook URL
 
 ### 追加で設定が必要なシークレット（オプション）
 以下は3DモデルやモーションカテゴリーをDiscordに通知したい場合のみ設定：
 
 - **DISCORD_WEBHOOK_3D** - 3Dモデル生成論文用のDiscord Webhook URL
 - **DISCORD_WEBHOOK_MOTION** - モーション生成論文用のDiscord Webhook URL
+- **DISCORD_WEBHOOK_MOVIE** - 動画生成論文用のDiscord Webhook URL
 
 ※ これらのWebhook URLは、Discordチャンネルの設定 > 連携サービス > ウェブフックから作成できます。
 
