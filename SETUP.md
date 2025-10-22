@@ -33,6 +33,7 @@ Edit the `.env` file and add your credentials:
 - `DISCORD_WEBHOOK_3D`: Discord webhook URL for 3D model papers (optional)
 - `DISCORD_WEBHOOK_MOTION`: Discord webhook URL for motion generation papers (optional)
 - `DISCORD_WEBHOOK_MOVIE`: Discord webhook URL for video generation papers (optional)
+- `DISCORD_WEBHOOK_INTELLIGENCE`: Discord webhook URL for security intelligence papers (optional)
 
 ### 4. Test the setup
 ```bash
@@ -46,6 +47,7 @@ uv run python source/fetch_arxiv_papers.py
    - 3D model generation (NeRF, Gaussian Splatting, etc.)
    - Motion generation (animation, human motion)
    - Video generation (text-to-video, video synthesis)
+   - Security intelligence (threat analysis, malware, vulnerability)
 
 2. **Filters papers** by date (only processes papers from the last 7 days by default)
 

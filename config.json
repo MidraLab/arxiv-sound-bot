@@ -27,6 +27,13 @@
       "query": "(cat:cs.CV OR cat:cs.GR) AND (abs:\"video generation\" OR abs:\"video synthesis\" OR abs:\"text-to-video\")",
       "json_file": "opt/movie_info.json",
       "description": "動画生成・動画合成"
+    },
+    {
+      "name": "intelligence",
+      "webhook_env": "DISCORD_WEBHOOK_INTELLIGENCE",
+      "query": "cat:cs.CR AND (abs:\"threat\" OR abs:\"malware\" OR abs:\"intrusion\" OR abs:\"vulnerability\" OR abs:\"attack detection\" OR abs:\"threat intelligence\" OR abs:\"security intelligence\" OR abs:\"exploit\" OR abs:\"botnet\" OR abs:\"phishing\" OR abs:\"ransomware\")",
+      "json_file": "opt/intelligence_info.json",
+      "description": "セキュリティインテリジェンス・脅威分析"
     }
   ],
   "max_papers_per_category": 10,
