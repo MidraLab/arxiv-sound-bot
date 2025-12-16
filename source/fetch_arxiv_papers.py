@@ -121,7 +121,7 @@ def process_category(category_config, config):
             break
         
         # 環境変数が設定されている場合のみDiscordに送信
-        if os.environ.get('GEMINI_API_KEY'):
+        if os.environ.get('OPENAI_API_KEY'):
             discord_util.send_message(entry)
         else:
             print(f"環境変数未設定のため、Discordへの送信をスキップ: {current_id}")
@@ -137,7 +137,7 @@ def process_category(category_config, config):
         time.sleep(config.get('wait_time_seconds', 5))  # 連続して送信しないように待機
     
     # Discordに完了したことを通知（環境変数が設定されている場合のみ）
-    if os.environ.get('GEMINI_API_KEY') and paper_count > 0:
+    if os.environ.get('OPENAI_API_KEY') and paper_count > 0:
         discord_util.send_completion_message(paper_count, category_config['name'])
     else:
         print(f"処理完了: {paper_count}件の論文を処理しました。")
@@ -151,9 +151,9 @@ def run():
     if not config:
         return
     
-    # Gemini APIキーの確認
-    if not os.environ.get('GEMINI_API_KEY'):
-        print("エラー: GEMINI_API_KEY が設定されていません。")
+    # OpenAI APIキーの確認
+    if not os.environ.get('OPENAI_API_KEY'):
+        print("エラー: OPENAI_API_KEY が設定されていません。")
         return
     
     # 各カテゴリを処理

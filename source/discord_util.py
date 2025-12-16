@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 import requests
-from gemini_util import GeminiUtil as GeminiUtilClass
+from openai_util import OpenAIUtil
 
 class DiscordUtil:
     def __init__(self, webhook_url=None):
@@ -12,7 +12,7 @@ class DiscordUtil:
         """
         load_dotenv()
         self.discord_web_hook = webhook_url or os.environ.get('DISCORD_WEBHOOK_URL')
-        self.gemini_util = GeminiUtilClass()  # インスタンス生成
+        self.openai_util = OpenAIUtil()  # インスタンス生成
         
     def send_message(self, entry) -> None:
         """
@@ -42,7 +42,7 @@ class DiscordUtil:
         # 論文情報をフォーマット
         message_content = (
             f"📄 **{title}**\n\n"
-            f"📝 **要約（日本語）:**\n{self.gemini_util.translate(summary)}\n\n"
+            f"📝 **要約（日本語）:**\n{self.openai_util.translate(summary)}\n\n"
             f"🔗 **リンク:**\n"
             f"• [AlphaXivで読む]({alphaxiv_url}) - コメント・議論付き\n"
             f"• [PDF](<{pdf_url}>) | [arXiv]({arxiv_url})\n\n"

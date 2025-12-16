@@ -9,7 +9,7 @@ ArXivから音声処理・3Dモデル生成・モーション生成に関する�
   - 3Dモデル生成（NeRF、Gaussian Splatting等）
   - モーション生成（アニメーション、人体動作）
 - 各カテゴリごとに異なるDiscordチャンネルに通知
-- 論文要約を日本語に翻訳（Gemini API使用）
+- 論文要約を日本語に翻訳（OpenAI GPT-5 nano使用）
 
 ## セットアップ
 ```bash
@@ -22,7 +22,7 @@ cp .env.example .env
 ```
 
 ## 環境変数
-- `GEMINI_API_KEY`: Google Gemini APIキー（必須）
+- `OPENAI_API_KEY`: OpenAI APIキー（必須）
 - `DISCORD_WEBHOOK_SOUND`: 音声処理論文用のWebhook URL
 - `DISCORD_WEBHOOK_3D`: 3Dモデル生成論文用のWebhook URL
 - `DISCORD_WEBHOOK_MOTION`: モーション生成論文用のWebhook URL
@@ -43,7 +43,7 @@ uv run python source/fetch_arxiv_papers.py
 
 ### GitHub Actions（推奨）
 GitHub Actionsで自動実行する場合は、リポジトリのSecretsに以下を設定：
-- `GEMINI_API_KEY`
+- `OPENAI_API_KEY`
 - `DISCORD_WEBHOOK_SOUND`
 - `DISCORD_WEBHOOK_3D`
 - `DISCORD_WEBHOOK_MOTION`
