@@ -18,7 +18,7 @@ class OpenAIUtil:
             str: Japanese translation
         """
         response = self.client.chat.completions.create(
-            model="gpt-5-nano",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "あなたは日本語と英語の翻訳を行うAIです。渡した内容の文章を日本語に翻訳してください。"},
                 {"role": "user", "content": text}
