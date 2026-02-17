@@ -34,6 +34,7 @@ jobs:
         DISCORD_WEBHOOK_MOTION: ${{ secrets.DISCORD_WEBHOOK_MOTION }}
         DISCORD_WEBHOOK_MOVIE: ${{ secrets.DISCORD_WEBHOOK_MOVIE }}
         DISCORD_WEBHOOK_INTELLIGENCE: ${{ secrets.DISCORD_WEBHOOK_INTELLIGENCE }}
+        DISCORD_WEBHOOK_AI_TOWN: ${{ secrets.DISCORD_WEBHOOK_AI_TOWN }}
       run: |
         uv run python source/fetch_arxiv_papers.py
     

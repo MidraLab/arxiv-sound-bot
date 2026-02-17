@@ -17,6 +17,7 @@ GitHubリポジトリの Settings > Secrets and variables > Actions から以下
 - **DISCORD_WEBHOOK_MOTION** - モーション生成論文用のDiscord Webhook URL
 - **DISCORD_WEBHOOK_MOVIE** - 動画生成論文用のDiscord Webhook URL
 - **DISCORD_WEBHOOK_INTELLIGENCE** - セキュリティインテリジェンス論文用のDiscord Webhook URL
+- **DISCORD_WEBHOOK_AI_TOWN** - AI Town系シミュレーション論文用のDiscord Webhook URL
 
 ※ これらのWebhook URLは、Discordチャンネルの設定 > 連携サービス > ウェブフックから作成できます。
 

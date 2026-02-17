@@ -34,6 +34,13 @@
       "query": "cat:cs.CR AND (abs:\"threat\" OR abs:\"malware\" OR abs:\"intrusion\" OR abs:\"vulnerability\" OR abs:\"attack detection\" OR abs:\"threat intelligence\" OR abs:\"security intelligence\" OR abs:\"exploit\" OR abs:\"botnet\" OR abs:\"phishing\" OR abs:\"ransomware\")",
       "json_file": "opt/intelligence_info.json",
       "description": "セキュリティインテリジェンス・脅威分析"
+    },
+    {
+      "name": "ai_town",
+      "webhook_env": "DISCORD_WEBHOOK_AI_TOWN",
+      "query": "(cat:cs.MA OR cat:cs.AI OR cat:cs.CL) AND (abs:\"generative agents\" OR abs:\"multi-agent simulation\" OR abs:\"agent simulation\" OR abs:\"agent-based simulation\" OR abs:\"social simulation\" OR abs:\"agent society\" OR abs:\"simulated society\" OR abs:\"virtual society\" OR abs:\"agent-based model\" OR abs:\"LLM-based simulation\" OR abs:\"LLM-based agent\" OR abs:\"virtual town\" OR abs:\"civilization simulation\" OR abs:\"world simulation\" OR abs:\"simulate human\")",
+      "json_file": "opt/ai_town_info.json",
+      "description": "AI Town系シミュレーション・生成エージェント社会"
     }
   ],
   "max_papers_per_category": 10,
